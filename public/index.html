@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Chat en Tiempo Real</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      color: #333;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+      width: 100%;
+      max-width: 600px;
+      margin-bottom: 20px;
+    }
+    li {
+      background-color: #e0e0e0;
+      padding: 10px;
+      margin: 5px 0;
+      border-radius: 5px;
+    }
+    input[type="text"] {
+      padding: 10px;
+      width: 80%;
+      margin-right: 10px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>Chat en Tiempo Real</h1>
+  <ul id="messages"></ul>
+  <form id="chat-form">
+    <input type="text" id="message" placeholder="Escribe tu mensaje" required>
+    <button type="submit">Enviar</button>
+  </form>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // Conectar al servidor de Socket.IO
+    const socket = io();
+
+    // Referencias del DOM
+    const messageInput = document.getElementById('message');
+    const messagesList = document.getElementById('messages');
+    const form = document.getElementById('chat-form');
+
+    // Enviar un mensaje al servidor cuando el formulario se envía
+    form.addEventListener('submit', (event) => {
+      event.preventDefault();
+      const message = messageInput.value.trim();
+      if (message) {
+        socket.emit('chatMessage', message);  // Emitir el mensaje al servidor
+        messageInput.value = '';              // Limpiar el campo de entrada
+      }
+    });
+
+    // Recibir un mensaje desde el servidor y mostrarlo
+    socket.on('chatMessage', (msg) => {
+      const li = document.createElement('li');
+      li.textContent = msg;
+      messagesList.appendChild(li);
+      window.scrollTo(0, document.body.scrollHeight);  // Desplazar hacia abajo automáticamente
+    });
+  </script>
+</body>
+</html>
